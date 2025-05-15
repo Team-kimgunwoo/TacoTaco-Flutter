@@ -1,6 +1,7 @@
 // lib/views/signup_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:tacotaco_flutter/views/login/LoginScreen.dart';
 import 'package:tacotaco_flutter/widgets/button/CustomButton.dart';
 import 'package:tacotaco_flutter/widgets/textfield/CustomTextField.dart';
 import 'package:tacotaco_flutter/theme/colors.dart';
@@ -34,7 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void goToLogin() {
     // TODO: 로그인 화면으로 이동
-    print('로그인 화면 이동');
+    Navigator.pop(context);
   }
 
   @override
@@ -46,11 +47,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 80),
+                Image.asset('assets/taco.png'),
                 const Text(
-                  '회원가입',
+                  'TACOTACO',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -82,15 +84,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 16),
                 Center(
-                  child: TextButton(
-                    onPressed: goToLogin,
-                    child: const Text(
-                      '이미 계정이 있으신가요? 로그인',
-                      style: TextStyle(
-                        color: AppColors.primaryGreen,
-                        fontSize: 14,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        '이미 계정이 있으신가요?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: goToLogin,
+                        child: const Text(
+                          '로그인',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
