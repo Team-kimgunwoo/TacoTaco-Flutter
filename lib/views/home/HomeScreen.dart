@@ -1,35 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:tacotaco_flutter/widgets/card/StatusCard.dart';
-import 'package:tacotaco_flutter/views/home/HomeDrawer.dart';
+import 'package:provider/provider.dart';
+
+import 'package:tacotaco_flutter/viewmodels/home/HomeViewmodel.dart';
+import '../../widgets/card/StatusCard.dart';
+import 'HomeDrawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => HomeViewModel(),
+      child: const _HomeScreenBody(),
+    );
+  }
+}
+
+class _HomeScreenBody extends StatelessWidget {
+  const _HomeScreenBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<HomeViewModel>();
+    final userLocation = viewModel.userLocation;
+    final markers = viewModel.locations;
+
     return Scaffold(
       drawer: const HomeDrawer(),
       body: Stack(
         children: [
-          // flutter_map 지도
-          FlutterMap(
-            options: MapOptions(
-              center: LatLng(37.5665, 126.9780),
-              zoom: 18.0,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                subdomains: ['a', 'b', 'c'],
-                userAgentPackageName: 'com.example.tacotaco',
+          if (userLocation != null)
+            FlutterMap(
+              options: MapOptions(
+                center: userLocation,
+                zoom: 18,
               ),
-            ],
-          ),
+              children: [
+                TileLayer(
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                  userAgentPackageName: 'com.example.tacotaco',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: userLocation,
+                      width: 40,
+                      height: 40,
+                      builder: (_) => const Icon(Icons.person_pin_circle, color: Colors.blue, size: 36),
+                    ),
+                    ...markers.map(
+                          (e) => Marker(
+                        point: e.toLatLng(),
+                        width: 40,
+                        height: 40,
+                        builder: (_) => const Icon(Icons.location_on, color: Colors.red, size: 36),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            )
+          else
+            const Center(child: CircularProgressIndicator()),
 
-
-          // 오른쪽 상단 프로필 버튼
+          // 프로필 버튼
           Positioned(
             top: 40,
             right: 20,
@@ -41,17 +78,6 @@ class HomeScreen extends StatelessWidget {
                   child: Icon(Icons.person, color: Colors.white),
                 ),
               ),
-            ),
-          ),
-
-          // 유저 위치 마커 예시 (flutter_map Marker로 변경 가능)
-          Positioned(
-            top: 300,
-            left: 150,
-            child: CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150'), // 유저 프로필 이미지 URL
             ),
           ),
 

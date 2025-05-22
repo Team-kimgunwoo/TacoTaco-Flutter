@@ -64,6 +64,9 @@
 		<string>storykompassauth</string>
 	</array>
 
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>앱이 위치 정보를 사용합니다.</string>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
