@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tacotaco_flutter/views/home/HomeScreen.dart';
 import 'package:tacotaco_flutter/views/signup/SignUpScreen.dart';
 import 'package:tacotaco_flutter/widgets/button/CustomButton.dart';
 import 'package:tacotaco_flutter/widgets/textfield/CustomTextField.dart';
@@ -19,8 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    // TODO: 로그인 로직 연결
-    print('로그인 시도: $email / $password');
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => Homescreen())
+    );
   }
 
   void goToSignUp() {
