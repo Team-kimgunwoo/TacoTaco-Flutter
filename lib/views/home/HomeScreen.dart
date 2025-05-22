@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 
-import 'package:tacotaco_flutter/viewmodels/home/HomeViewmodel.dart';
+import '../../viewmodels/Home/HomeViewmodel.dart';
 import '../../widgets/card/StatusCard.dart';
 import 'HomeDrawer.dart';
 

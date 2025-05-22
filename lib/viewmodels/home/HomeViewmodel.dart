@@ -1,50 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:dio/dio.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:tacotaco_flutter/viewmodels/home/CardViewmodel.dart'; // 경로는 프로젝트 구조에 맞게 수정
 
-import 'package:tacotaco_flutter/models/home/LocationPoint.dart';
+class Homeviewmodel extends StatelessWidget {
+  const Homeviewmodel({super.key});
 
-class HomeViewModel extends ChangeNotifier {
-  final Dio _dio = Dio();
-  List<LocationPoint> _locations = [];
-  LatLng? _userLocation;
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = StatusCardViewModel();
 
-  List<LocationPoint> get locations => _locations;
-  LatLng? get userLocation => _userLocation;
-
-  HomeViewModel() {
-    _initUserLocation();
-    fetchLocations();
-  }
-
-  Future<void> _initUserLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) return;
-      }
-
-      final position = await Geolocator.getCurrentPosition();
-      _userLocation = LatLng(position.latitude, position.longitude);
-      notifyListeners();
-    } catch (e) {
-      debugPrint("🚨 위치 가져오기 실패: $e");
-    }
-  }
-
-  Future<void> fetchLocations() async {
-    try {
-      final response = await _dio.get('https://your-api.com/locations'); // 실제 주소로 교체
-      final List data = response.data;
-      _locations = data.map((e) => LocationPoint.fromJson(e)).toList();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("🚨 마커 데이터 로드 실패: $e");
-    }
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("지금 건우는?", style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text("마트앞사람 찾는중...", style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                // TODO: 첫 번째 기능은 추후 구현
+              },
+              icon: const Icon(Icons.thumb_up_alt_outlined),
+            ),
+            IconButton(
+              onPressed: () {
+                viewModel.makePhoneCall('01012345678');
+              },
+              icon: const Icon(Icons.call),
+            ),
+            IconButton(
+              onPressed: () {
+                viewModel.sendSMS('01012345678');
+              },
+              icon: const Icon(Icons.chat_bubble_outline),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
