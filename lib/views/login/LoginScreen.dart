@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = passwordController.text.trim();
 
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => Homescreen())
+        MaterialPageRoute(builder: (context) => HomeScreen())
     );
   }
 
