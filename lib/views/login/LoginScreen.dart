@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tacotaco_flutter/views/home/HomeScreen.dart';
+import 'package:tacotaco_flutter/views/signup/SignUpScreen.dart';
 import 'package:tacotaco_flutter/widgets/button/CustomButton.dart';
 import 'package:tacotaco_flutter/widgets/textfield/CustomTextField.dart';
 import 'package:tacotaco_flutter/theme/colors.dart';
@@ -18,13 +20,15 @@ class _LoginScreenState extends State<LoginScreen> {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    // TODO: 로그인 로직 연결
-    print('로그인 시도: $email / $password');
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => HomeScreen())
+    );
   }
 
   void goToSignUp() {
-    // TODO: 회원가입 화면 이동
-    print('회원가입 화면 이동');
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const SignUpScreen())
+    );
   }
 
   @override
@@ -35,11 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 80),
+              Image.asset('assets/taco.png'),
               const Text(
-                '로그인',
+                'TACOTACO',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -65,15 +70,27 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
               Center(
-                child: TextButton(
-                  onPressed: goToSignUp,
-                  child: const Text(
-                    '계정이 없으신가요? 회원가입',
-                    style: TextStyle(
-                      color: AppColors.primaryGreen,
-                      fontSize: 14,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      '아직 건우를 못보시나요?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: goToSignUp,
+                      child: const Text(
+                        '친구하러 가기',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
