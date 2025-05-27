@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
-
-import '../../viewmodels/Home/HomeViewmodel.dart';
+import 'package:latlong2/latlong.dart';
 import '../../widgets/card/StatusCard.dart';
+import 'package:tacotaco_flutter/viewmodels/home/HomeViewmodel.dart';
+import 'package:tacotaco_flutter/viewmodels/home/CardViewmodel.dart';
+
 import 'HomeDrawer.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -53,7 +55,7 @@ class _HomeScreenBody extends StatelessWidget {
                     ),
                     ...markers.map(
                           (e) => Marker(
-                        point: e.toLatLng(),
+                        point: e, // ✅ 이미 LatLng 타입임
                         width: 40,
                         height: 40,
                         builder: (_) => const Icon(Icons.location_on, color: Colors.red, size: 36),
@@ -86,10 +88,22 @@ class _HomeScreenBody extends StatelessWidget {
             bottom: 20,
             left: 16,
             right: 16,
-            child: StatusCard(),
+            child: _StatusCardWithProvider(),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StatusCardWithProvider extends StatelessWidget {
+  const _StatusCardWithProvider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => StatusCardViewModel(),
+      child: const StatusCard(),
     );
   }
 }
