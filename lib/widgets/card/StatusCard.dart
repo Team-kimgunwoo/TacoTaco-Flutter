@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tacotaco_flutter/viewmodels/home/CardViewmodel.dart';
 
 class StatusCard extends StatelessWidget {
   const StatusCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<StatusCardViewModel>(context);
+
     return Card(
       elevation: 6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -22,9 +26,24 @@ class StatusCard extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.thumb_up_alt_outlined)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.call)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.chat_bubble_outline)),
+            IconButton(
+              onPressed: () {
+                // TODO: 향후 좋아요 기능
+              },
+              icon: const Icon(Icons.thumb_up_alt_outlined),
+            ),
+            IconButton(
+              onPressed: () {
+                viewModel.makePhoneCall('01012345678');
+              },
+              icon: const Icon(Icons.call),
+            ),
+            IconButton(
+              onPressed: () {
+                viewModel.sendSMS('01012345678');
+              },
+              icon: const Icon(Icons.chat_bubble_outline),
+            ),
           ],
         ),
       ),
