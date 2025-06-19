@@ -34,13 +34,13 @@ class StatusCard extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                viewModel.makePhoneCall('01012345678');
+                viewModel.makePhoneCall('01030090642');
               },
               icon: const Icon(Icons.call),
             ),
             IconButton(
               onPressed: () {
-                viewModel.sendSMS('01012345678');
+                viewModel.sendSMS('01030090642');
               },
               icon: const Icon(Icons.chat_bubble_outline),
             ),
