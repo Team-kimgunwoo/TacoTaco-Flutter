@@ -1,10 +1,8 @@
-// lib/views/signup_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:tacotaco_flutter/views/login/LoginScreen.dart';
+import 'package:tacotaco_flutter/theme/colors.dart';
+import 'package:tacotaco_flutter/viewmodels/signup/SignupViewModel.dart';  // 경로 확인 필요
 import 'package:tacotaco_flutter/widgets/button/CustomButton.dart';
 import 'package:tacotaco_flutter/widgets/textfield/CustomTextField.dart';
-import 'package:tacotaco_flutter/theme/colors.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,27 +12,33 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  void signUp() {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
-    String confirmPassword = confirmPasswordController.text.trim();
+  bool _isLoading = false;
 
-    if (password != confirmPassword) {
-      // TODO: 패스워드 불일치 처리
-      print('비밀번호가 일치하지 않습니다.');
-      return;
-    }
+  void signUp() async {
+    final vm = SignUpViewModel.instance;
 
-    // TODO: 회원가입 로직 연결
-    print('회원가입 시도: $email / $password');
+    vm.model.email = emailController.text.trim();
+    vm.model.name = nameController.text.trim();
+    vm.model.password1 = passwordController.text.trim();
+    vm.model.password2 = confirmPasswordController.text.trim();
+
+    setState(() => _isLoading = true);
+
+    await vm.signUp(context, () {
+      setState(() => _isLoading = false);
+      // 회원가입 성공 시 로그인 화면으로 돌아가기
+      Navigator.pop(context);
+    });
+
+    setState(() => _isLoading = false);
   }
 
   void goToLogin() {
-    // TODO: 로그인 화면으로 이동
     Navigator.pop(context);
   }
 
@@ -66,6 +70,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: emailController,
                 ),
                 CustomTextField(
+                  label: '이름',
+                  hintText: '이름을 입력하세요',
+                  controller: nameController,
+                ),
+                CustomTextField(
                   label: '비밀번호',
                   hintText: '비밀번호를 입력하세요',
                   controller: passwordController,
@@ -78,7 +87,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 40),
-                CustomButton(
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : CustomButton(
                   text: '회원가입',
                   onPressed: signUp,
                 ),
