@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
-import '../../widgets/card/StatusCard.dart';
+import 'package:provider/provider.dart';
 import 'package:tacotaco_flutter/viewmodels/home/HomeViewmodel.dart';
-import 'package:tacotaco_flutter/viewmodels/home/CardViewmodel.dart';
-
-import 'HomeDrawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,7 +10,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => HomeViewModel(),
+      create: (_) => HomeViewModel()
+        ..updateUserLocation()
+        ..fetchServerLocation()
+        ..sendFCMTokenToServer()
+        ..getEmotion(),
       child: const _HomeScreenBody(),
     );
   }
@@ -23,46 +23,60 @@ class HomeScreen extends StatelessWidget {
 class _HomeScreenBody extends StatelessWidget {
   const _HomeScreenBody();
 
+  String _emotionMessage(String emotionType) {
+    switch (emotionType) {
+      case 'WAR':
+        return '계엄령 선포!!';
+      case 'BASEBALL':
+        return '야구할 사람 찾는중...';
+      case 'MART':
+        return '마트갈 사람 찾는중...';
+      case 'OUTING':
+        return '외출중...';
+      case 'COUNSEL':
+        return '상담 하는중...';
+      case 'DROP':
+        return '자퇴 고민중...';
+      default:
+        return emotionType;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
-    final userLocation = viewModel.userLocation;
-    final markers = viewModel.locations;
+    final markers = viewModel.annotationItems.map((item) => Marker(
+      point: LatLng(item.latitude, item.longitude),
+      width: 40,
+      height: 40,
+      builder: (_) => Icon(
+        item.isUserLocation ? Icons.person_pin_circle : Icons.location_on,
+        color: item.isUserLocation ? Colors.blue : Colors.red,
+        size: 36,
+      ),
+    )).toList();
+
+    final user = viewModel.annotationItems.firstWhere(
+          (item) => item.isUserLocation,
+      orElse: () => CoordinateItem(latitude: 0, longitude: 0, isUserLocation: true),
+    );
 
     return Scaffold(
-      drawer: const HomeDrawer(),
       body: Stack(
         children: [
-          if (userLocation != null)
+          if (viewModel.annotationItems.isNotEmpty)
             FlutterMap(
               options: MapOptions(
-                center: userLocation,
+                center: LatLng(user.latitude, user.longitude),
                 zoom: 18,
               ),
               children: [
                 TileLayer(
                   urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                   subdomains: ['a', 'b', 'c'],
-                  userAgentPackageName: 'com.example.tacotaco',
+                  userAgentPackageName: 'com.example.tacotaco_flutter',
                 ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: userLocation,
-                      width: 40,
-                      height: 40,
-                      builder: (_) => const Icon(Icons.person_pin_circle, color: Colors.blue, size: 36),
-                    ),
-                    ...markers.map(
-                          (e) => Marker(
-                        point: e, // ✅ 이미 LatLng 타입임
-                        width: 40,
-                        height: 40,
-                        builder: (_) => const Icon(Icons.location_on, color: Colors.red, size: 36),
-                      ),
-                    )
-                  ],
-                ),
+                MarkerLayer(markers: markers),
               ],
             )
           else
@@ -84,26 +98,51 @@ class _HomeScreenBody extends StatelessWidget {
           ),
 
           // 하단 카드
-          const Positioned(
+          Positioned(
             bottom: 20,
             left: 16,
             right: 16,
-            child: _StatusCardWithProvider(),
-          ),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("지금 건우는?", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.blue)),
+                      const SizedBox(height: 4),
+                      Text(_emotionMessage("알 수 없음"), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w300)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: viewModel.sendTouchRequest,
+                        icon: const Icon(Icons.touch_app, color: Colors.black),
+                      ),
+                      IconButton(
+                        onPressed: viewModel.makeCall,
+                        icon: const Icon(Icons.phone, color: Colors.black),
+                      ),
+                      IconButton(
+                        onPressed: viewModel.sendMessage,
+                        icon: const Icon(Icons.message, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )
         ],
       ),
-    );
-  }
-}
-
-class _StatusCardWithProvider extends StatelessWidget {
-  const _StatusCardWithProvider({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => StatusCardViewModel(),
-      child: const StatusCard(),
+      drawer: const Drawer(child: Center(child: Text("MypageView Placeholder"))),
     );
   }
 }

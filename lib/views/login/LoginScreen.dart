@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tacotaco_flutter/views/home/HomeScreen.dart';
+import 'package:provider/provider.dart';
+import 'package:tacotaco_flutter/viewmodels/login/LoginViewmodel.dart';
 import 'package:tacotaco_flutter/views/signup/SignUpScreen.dart';
 import 'package:tacotaco_flutter/widgets/button/CustomButton.dart';
 import 'package:tacotaco_flutter/widgets/textfield/CustomTextField.dart';
@@ -16,18 +17,29 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void login() {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
+  bool isLoading = false;
 
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => HomeScreen())
-    );
+  void login() async {
+    final signInViewModel = context.read<SignInViewModel>();
+
+    signInViewModel.model.email = emailController.text.trim();
+    signInViewModel.model.password = passwordController.text.trim();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    await signInViewModel.signIn(context);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   void goToSignUp() {
-    Navigator.push(context,
-      MaterialPageRoute(builder: (context) => const SignUpScreen())
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SignUpScreen()),
     );
   }
 
@@ -64,7 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
               ),
               const SizedBox(height: 40),
-              CustomButton(
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : CustomButton(
                 text: '로그인',
                 onPressed: login,
               ),
